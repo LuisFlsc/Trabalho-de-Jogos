@@ -5,13 +5,14 @@ pygame.init()
 pygame.font.init()
 
 
-
+x, y = 80,200
+ 
 font = font = pygame.font.Font(None, 50)
-Nome = "Seu Nome"
-rect =  (260, 100, 175, 35)
+Nome = "Luis Filipe Lamonica Salvador Caliman"
+rect =  (x, y, 650, 40)
 
-random.seed(Nome)
-x, y =  random.randint(0, 500), random.randint(0, 400)
+#random.seed(Nome)
+#x, y =  random.randint(0, 500), random.randint(0, 400)
 
 print(y)
 
