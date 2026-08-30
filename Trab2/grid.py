@@ -1,58 +1,77 @@
-# Classe base abstrata (Abstract Base Class)
 from abc import ABC, abstractmethod
+import pygame
 
-
-# objeto herda de classe abstrata
-## nunca pode ser criada, só as filhas
-class obj (ABC):
-
+class obj(ABC):
     def __init__(self, x, y, sprites):
         self.x = x
         self.y = y
-        #lista
         self.sprites = sprites
-
 
     def draw(self, screen):
         for s in self.sprites:
-            screen.blit(self.sprites, (self.x, self.y))
+            screen.blit(s, (self.x, self.y))
 
-    # avisa que o método é abstato e precisa ser feito pelos filhos
     @abstractmethod
     def update(self, dt):
         pass
 
-class Grid (obj):
 
-    # só avisa a construtora da mãe o que fazer
-    # pode, e deve ser extendido para outras caracteristicas nescessárias
-    def __init__(self, x, y, sprites, grid_size):
-        # bom lugar para criar uma matriz de celulas
-        super().__init__(x, y, sprites)
+class Cell(obj):
+    def __init__(self, x, y, size, color, row, col):
+        super().__init__(x, y, [])
+        self.size = size
+        self.color = color
+        self.row = row
+        self.col = col
+        self.piece = None
 
-    def draw(self, screen):
-
-        # chama o desenha já pronto de obj, mas pode ser extendido
-        return super().draw(screen)
-
-    def update(self, dt):
-        # não chama o de super, porque ele não implementa, crie seu próprio
-        return 
-
-
-class Cell (obj):
-
-    # só avisa a construtora da mãe o que fazer
-    # pode, e deve ser extendido para outras caracteristicas nescessárias
-    def __init__(self, x, y, sprites, grid_size):
-        # bom lugar para definir coisas como o fundo da céula
-        super().__init__(x, y, sprites)
-
-    def draw(self, screen):
-
-        # chama o desenha já pronto de obj, mas pode ser extendido
-        return super().draw(screen)
+        surface = pygame.Surface((size, size))
+        surface.fill(self.color)
+        self.sprites = [surface]
 
     def update(self, dt):
-        # não chama o de super, porque ele não implementa, crie seu próprio
-        return 
+        pass
+
+
+class Grid(obj):
+    def __init__(self, x, y, grid_size=(8, 8), cell_size=70):
+        super().__init__(x, y, [])
+        self.rows, self.cols = grid_size
+        self.cell_size = cell_size
+        self.cells = []
+
+        color_light = (235, 226, 240)
+        color_dark = (150, 120, 170)
+
+        for r in range(self.rows):
+            row_cells = []
+            for c in range(self.cols):
+                cx = self.x + c * cell_size
+                cy = self.y + r * cell_size
+                color = color_light if (r + c) % 2 == 0 else color_dark
+                row_cells.append(Cell(cx, cy, cell_size, color, r, c))
+            self.cells.append(row_cells)
+
+    def get_cell_from_mouse(self, mouse_pos):
+        mx, my = mouse_pos
+        col = (mx - self.x) // self.cell_size
+        row = (my - self.y) // self.cell_size
+        if 0 <= row < self.rows and 0 <= col < self.cols:
+            return row, col
+        return None
+
+    def get_piece(self, row, col):
+        """Retorna a peça em (row, col) ou None se fora do tabuleiro/vazia."""
+        if 0 <= row < self.rows and 0 <= col < self.cols:
+            return self.cells[row][col].piece
+        return None
+
+    def draw(self, screen):
+        for row in self.cells:
+            for cell in row:
+                cell.draw(screen)
+
+    def update(self, dt):
+        for row in self.cells:
+            for cell in row:
+                cell.update(dt)
