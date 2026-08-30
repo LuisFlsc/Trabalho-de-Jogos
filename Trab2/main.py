@@ -1,66 +1,27 @@
 import pygame
-from grid import Grid, Cell
-
+from game import ChessGame
 
 pygame.init()
 pygame.font.init()
 
-WIDTH   =  800; HEIGHT =  600
-screen = pygame.display.set_mode((WIDTH, HEIGHT))  
+WIDTH = 800; HEIGHT = 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Xadrez em Pygame")
 
-# caso precise de usar fontes na main, descomente
+game = ChessGame(WIDTH, HEIGHT)
+clock = pygame.time.Clock()
 
-#font_size
-#font = pygame.font.Font(None, font_size)
+while True:
+    dt = clock.tick(60) / 1000.0
 
-# caso precise carregar imagens na main, descomente
-
-#idle = pygame.image.load("images/duck/duck.png").convert_alpha()
-#step = pygame.image.load("images/duck/step.png").convert_alpha()
-#etc
-
-
-#numero de celulas
-grid_size = (5, 10)
-
-
-# Cria a janela
-WIDTH   =  800; HEIGHT =  600
-screen = pygame.display.set_mode((WIDTH, HEIGHT))  
-
-#criar objetos, adicione eles a lista
-objects = []
-
-while True: 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            exit()
+        else:
+            game.handle_event(event)
 
-        # uso do mouse é obrigatório
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if pygame.mouse.get_pressed()[0]: # 0 botão esquedo 2, direito
-                pass # faça algo
-
-        #caso queira usar levantar o mouse, descomente
-        #elif event.type == pygame.MOUSEBUTTONUP:
-        #                    exit()
-
-
-        # uso do teclado para controle é obrigatório
-        elif event.type == pygame.KEYDOWN:
-            #inclua outras funcionalidades para outras téclas
-            if event.key == pygame.K_ESCAPE:
-                exit()
-
-        #atualiza
-        for obj in objects:
-            obj.update(1)
-
-        # Desenha
-        screen.fill((30, 30, 30))
-
-
-        for obj in objects:
-            obj.draw()
-
-        pygame.display.flip()
+    game.update(dt)
+    game.draw(screen)
+    pygame.display.flip()
